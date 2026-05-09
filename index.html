@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>阿离的备忘录</title>
+  <meta name="description" content="碎片思考，卡片记录">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+  <style>
+    :root {
+      --bg: #faf8f5;
+      --bg-card: #ffffff;
+      --bg-card-reading: #fefcf9;
+      --text: #3d3229;
+      --text-secondary: #8c7e6f;
+      --text-muted: #b5a99a;
+      --border: #ede8e1;
+      --shadow: 0 1px 3px rgba(61,50,41,0.06), 0 1px 2px rgba(61,50,41,0.04);
+      --shadow-hover: 0 4px 12px rgba(61,50,41,0.1), 0 2px 4px rgba(61,50,41,0.06);
+      --tag-bg: #fff3e0;
+      --tag-text: #e65100;
+      --accent: #ef6c00;
+      --green-tag-bg: #e8f5e9;
+      --green-tag-text: #2e7d32;
+      --blue-tag-bg: #e3f2fd;
+      --blue-tag-text: #1565c0;
+      --purple-tag-bg: #f3e5f5;
+      --purple-tag-text: #7b1fa2;
+      --red-tag-bg: #fce4ec;
+      --red-tag-text: #c62828;
+      --link: #ef6c00;
+      --code-bg: #f5f0ea;
+      --search-bg: #ffffff;
+      --source-bg: #f7f3ee;
+      --source-text: #8c7e6f;
+      --source-border: #e8e2da;
+      --radius: 12px;
+      --max-width: 680px;
+      --transition: 0.2s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg: #1a1714;
+      --bg-card: #252220;
+      --bg-card-reading: #282420;
+      --text: #e8e0d6;
+      --text-secondary: #a89e92;
+      --text-muted: #6d6358;
+      --border: #3a3530;
+      --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.15);
+      --shadow-hover: 0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+      --tag-bg: #3e2a1a;
+      --tag-text: #ffb74d;
+      --accent: #ffb74d;
+      --green-tag-bg: #1b3a1e;
+      --green-tag-text: #81c784;
+      --blue-tag-bg: #1a2a3e;
+      --blue-tag-text: #64b5f6;
+      --purple-tag-bg: #2a1a3e;
+      --purple-tag-text: #ce93d8;
+      --red-tag-bg: #3e1a1a;
+      --red-tag-text: #ef9a9a;
+      --link: #ffb74d;
+      --code-bg: #2e2a26;
+      --search-bg: #252220;
+      --source-bg: #2e2a26;
+      --source-text: #a89e92;
+      --source-border: #3a3530;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      font-size: 15px;
+      transition: background var(--transition), color var(--transition);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ===== Header ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      transition: background var(--transition), border-color var(--transition);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    [data-theme="dark"] .header {
+      background: rgba(26,23,20,0.92);
+    }
+
+    :not([data-theme="dark"]) .header,
+    [data-theme="light"] .header {
+      background: rgba(250,248,245,0.92);
+    }
+
+    .header-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    .logo-icon { font-size: 22px; line-height: 1; }
+
+    .logo-text {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all var(--transition);
+    }
+
+    .icon-btn:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .icon-btn.active {
+      color: var(--accent);
+      background: var(--tag-bg);
+    }
+
+    /* ===== Search ===== */
+    .search-bar {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+
+    .search-bar.open {
+      max-height: 70px;
+      padding: 0 20px 14px;
+    }
+
+    .search-input-wrap {
+      position: relative;
+    }
+
+    .search-input-wrap .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 16px;
+      height: 16px;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--search-bg);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      font-family: inherit;
+    }
+
+    .search-input::placeholder { color: var(--text-muted); }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(239,108,0,0.08);
+    }
+
+    .search-hint {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--border);
+      padding: 2px 6px;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    /* ===== Main ===== */
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 20px 20px 60px;
+    }
+
+    /* ===== Tag Filter ===== */
+    .tag-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .filter-tag {
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      border: none;
+      transition: all var(--transition);
+      font-family: inherit;
+      line-height: 1.4;
+    }
+
+    .filter-tag small {
+      opacity: 0.7;
+      margin-left: 2px;
+    }
+
+    .filter-tag.all {
+      background: var(--border);
+      color: var(--text-secondary);
+    }
+
+    .filter-tag.all.active {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .filter-tag[data-color="orange"] { background: var(--tag-bg); color: var(--tag-text); }
+    .filter-tag[data-color="green"] { background: var(--green-tag-bg); color: var(--green-tag-text); }
+    .filter-tag[data-color="blue"] { background: var(--blue-tag-bg); color: var(--blue-tag-text); }
+    .filter-tag[data-color="purple"] { background: var(--purple-tag-bg); color: var(--purple-tag-text); }
+    .filter-tag[data-color="red"] { background: var(--red-tag-bg); color: var(--red-tag-text); }
+
+    .filter-tag.active {
+      box-shadow: 0 0 0 2px var(--accent);
+      font-weight: 500;
+    }
+
+    /* ===== Date Group ===== */
+    .date-group { margin-bottom: 28px; }
+
+    .date-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      padding-left: 2px;
+    }
+
+    /* ===== Card ===== */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: box-shadow var(--transition), transform var(--transition), background var(--transition), border-color var(--transition);
+      animation: cardIn 0.35s ease both;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    .card:active { transform: translateY(0); }
+
+    /* Reading note card variant */
+    .card.is-reading {
+      background: var(--bg-card-reading);
+      border-left: 3px solid var(--accent);
+    }
+
+    .card.is-reading .source-quote {
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      background: var(--source-bg);
+      border-radius: 8px;
+      border: 1px solid var(--source-border);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--source-text);
+      line-height: 1.5;
+    }
+
+    .card.is-reading .source-quote .source-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .card.is-reading .source-quote .source-text {
+      font-style: italic;
+    }
+
+    .card.is-reading .source-quote .source-text strong {
+      font-style: normal;
+      color: var(--text-secondary);
+    }
+
+    .card-content {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .card-content p { margin-bottom: 10px; }
+    .card-content p:last-child { margin-bottom: 0; }
+
+    .card-content strong {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card-content a {
+      color: var(--link);
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--transition);
+    }
+
+    .card-content a:hover { border-bottom-color: var(--link); }
+
+    .card-content code {
+      background: var(--code-bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: "SF Mono", "Fira Code", "JetBrains Mono", Menlo, monospace;
+      color: var(--accent);
+    }
+
+    .card-content ol, .card-content ul {
+      margin: 8px 0;
+      padding-left: 20px;
+    }
+
+    .card-content li { margin-bottom: 4px; }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-decoration: none;
+      border: none;
+      font-family: inherit;
+    }
+
+    .tag[data-color="orange"] { background: var(--tag-bg); color: var(--tag-text); }
+    .tag[data-color="green"] { background: var(--green-tag-bg); color: var(--green-tag-text); }
+    .tag[data-color="blue"] { background: var(--blue-tag-bg); color: var(--blue-tag-text); }
+    .tag[data-color="purple"] { background: var(--purple-tag-bg); color: var(--purple-tag-text); }
+    .tag[data-color="red"] { background: var(--red-tag-bg); color: var(--red-tag-text); }
+
+    .tag:hover { opacity: 0.8; transform: scale(1.05); }
+
+    .card-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    /* ===== Empty State ===== */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+    .empty-text { font-size: 15px; line-height: 1.6; }
+
+    /* ===== Stats ===== */
+    .stats {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* ===== Animations ===== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== Scrollbar ===== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ===== Back to Top ===== */
+    .back-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all var(--transition);
+      z-index: 50;
+    }
+
+    .back-top.visible { opacity: 1; transform: translateY(0); }
+    .back-top:hover { box-shadow: var(--shadow-hover); color: var(--accent); }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      body { font-size: 14px; }
+      .header-inner { padding: 12px 16px; }
+      .container { padding: 16px 16px 48px; }
+      .card { padding: 16px; margin-bottom: 10px; }
+      .search-bar { padding: 0 16px; }
+      .search-bar.open { padding: 0 16px 12px; }
+      .search-hint { display: none; }
+      .back-top { bottom: 16px; right: 16px; }
+    }
+
+    /* ===== Selection ===== */
+    ::selection {
+      background: rgba(239,108,0,0.15);
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a class="logo" href="#">
+        <span class="logo-icon">📝</span>
+        <span class="logo-text">阿离的备忘录</span>
+      </a>
+      <div class="header-actions">
+        <button class="icon-btn" id="searchToggle" title="搜索" aria-label="搜索">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </button>
+        <button class="icon-btn" id="themeToggle" title="切换主题" aria-label="切换主题">🌙</button>
+      </div>
+    </div>
+    <div class="search-bar" id="searchBar">
+      <div class="search-input-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索卡片内容、标签、书名..." autocomplete="off">
+        <span class="search-hint">⌘K</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="app"></main>
+
+  <button class="back-top" id="backTop" title="回到顶部" aria-label="回到顶部">↑</button>
+
+  <script>
+    // ===== Tag Color Map =====
+    const TAG_COLORS = [
+      { pattern: /读书笔记|书评|摘录/i, color: 'blue' },
+      { pattern: /系统论|控制论|复杂/i, color: 'green' },
+      { pattern: /思考|哲学|认知|观点|感悟/i, color: 'purple' },
+      { pattern: /编程|代码|Java|Clojure|Swift|iOS|架构|后端|重构/i, color: 'orange' },
+      { pattern: /生活|日常|观察/i, color: 'red' },
+    ];
+
+    function getTagColor(tag) {
+      for (const tc of TAG_COLORS) {
+        if (tc.pattern.test(tag)) return tc.color;
+      }
+      const colors = ['orange', 'green', 'blue', 'purple', 'red'];
+      let hash = 0;
+      for (let i = 0; i < tag.length; i++) hash = ((hash << 5) - hash + tag.charCodeAt(i)) | 0;
+      return colors[Math.abs(hash) % colors.length];
+    }
+
+    // ===== Markdown-lite Parser =====
+    function parseContent(text) {
+      let html = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      // Code inline
+      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+      // Bold
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Links
+      html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+      // Tags in content (standalone #tag, not inside other syntax)
+      html = html.replace(/(^|\s)#([^\s#<]+)/g, (match, prefix, tag) => {
+        return `${prefix}<span class="tag" data-color="${getTagColor(tag)}" data-tag="${tag}" onclick="filterByTag('${tag}')">#${tag}</span>`;
+      });
+      // Ordered lists (1. 2. 3.)
+      html = html.replace(/(\d+)\.\s/g, '<li>');
+      // Paragraphs
+      const paragraphs = html.split(/\n\n+/);
+      html = paragraphs.map(p => {
+        let content = p.replace(/\n/g, '<br>');
+        // Wrap consecutive <li> in <ol>
+        if (content.includes('<li>')) {
+          content = '<ol>' + content + '</ol>';
+        }
+        return `<p>${content}</p>`;
+      }).join('');
+
+      return html;
+    }
+
+    // ===== Date Formatting =====
+    function formatDate(dateStr) {
+      const d = new Date(dateStr);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const diff = Math.floor((today - target) / 86400000);
+
+      if (diff === 0) return '今天';
+      if (diff === 1) return '昨天';
+      if (diff < 7) return `${diff}天前`;
+
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      if (d.getFullYear() === now.getFullYear()) {
+        return `${month}月${day}日`;
+      }
+      return `${d.getFullYear()}年${month}月${day}日`;
+    }
+
+    function formatTime(dateStr) {
+      const d = new Date(dateStr);
+      return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    function getDateKey(dateStr) {
+      const d = new Date(dateStr);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
+    function getDateLabel(dateStr) {
+      const d = new Date(dateStr);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const diff = Math.floor((today - target) / 86400000);
+
+      if (diff === 0) return '📍 今天';
+      if (diff === 1) return '📍 昨天';
+
+      const weekDays = ['周日','周一','周二','周三','周四','周五','周六'];
+      const month = d.getMonth() + 1;
+      const day = d.getDate();
+      const weekDay = weekDays[d.getDay()];
+
+      if (d.getFullYear() === now.getFullYear()) {
+        return `${month}月${day}日 ${weekDay}`;
+      }
+      return `${d.getFullYear()}年${month}月${day}日 ${weekDay}`;
+    }
+
+    // ===== State =====
+    let memos = [];
+    let activeTag = null;
+    let searchQuery = '';
+
+    // ===== Render =====
+    function render() {
+      const app = document.getElementById('app');
+      let filtered = [...memos];
+
+      // Filter by tag
+      if (activeTag) {
+        filtered = filtered.filter(m => m.tags && m.tags.includes(activeTag));
+      }
+
+      // Filter by search (content + tags + source)
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(m => {
+          const contentMatch = m.content.toLowerCase().includes(q);
+          const tagMatch = (m.tags || []).some(t => t.toLowerCase().includes(q));
+          const sourceMatch = m.source && m.source.toLowerCase().includes(q);
+          return contentMatch || tagMatch || sourceMatch;
+        });
+      }
+
+      // Build tag filter bar
+      const allTags = [...new Set(memos.flatMap(m => m.tags || []))].sort((a, b) => {
+        // Sort by count descending
+        const ca = memos.filter(m => m.tags && m.tags.includes(a)).length;
+        const cb = memos.filter(m => m.tags && m.tags.includes(b)).length;
+        return cb - ca;
+      });
+
+      let filterHtml = '<div class="tag-filter">';
+      filterHtml += `<button class="filter-tag all${activeTag ? '' : ' active'}" onclick="filterByTag(null)">全部 ${memos.length}</button>`;
+      allTags.forEach(tag => {
+        const color = getTagColor(tag);
+        const isActive = activeTag === tag ? ' active' : '';
+        const count = memos.filter(m => m.tags && m.tags.includes(tag)).length;
+        filterHtml += `<button class="filter-tag${isActive}" data-color="${color}" onclick="filterByTag('${tag}')">#${tag} <small>${count}</small></button>`;
+      });
+      filterHtml += '</div>';
+
+      if (filtered.length === 0) {
+        app.innerHTML = filterHtml + `
+          <div class="empty">
+            <div class="empty-icon">🔍</div>
+            <div class="empty-text">${searchQuery ? '没有找到匹配的卡片' : activeTag ? '这个标签下还没有卡片' : '还没有备忘录'}</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Group by date
+      const groups = {};
+      filtered.forEach(m => {
+        const key = getDateKey(m.created_at);
+        if (!groups[key]) groups[key] = { label: getDateLabel(m.created_at), items: [] };
+        groups[key].items.push(m);
+      });
+
+      const sortedKeys = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+
+      let cardsHtml = '';
+      sortedKeys.forEach(key => {
+        const group = groups[key];
+        cardsHtml += `<div class="date-group">`;
+        cardsHtml += `<div class="date-label">${group.label}</div>`;
+        group.items.forEach((m, i) => {
+          const isReading = !!m.source;
+          const tagsHtml = (m.tags || []).map(t =>
+            `<span class="tag" data-color="${getTagColor(t)}" onclick="filterByTag('${t}')">#${t}</span>`
+          ).join('');
+
+          // Source quote for reading notes
+          let sourceHtml = '';
+          if (m.source) {
+            sourceHtml = `
+              <div class="source-quote">
+                <span class="source-icon">📖</span>
+                <span class="source-text">摘自 <strong>${escapeHtml(m.source)}</strong></span>
+              </div>
+            `;
+          }
+
+          cardsHtml += `
+            <article class="card${isReading ? ' is-reading' : ''}" style="animation-delay: ${i * 0.05}s">
+              ${sourceHtml}
+              <div class="card-content">${parseContent(m.content)}</div>
+              <div class="card-footer">
+                <div class="card-tags">${tagsHtml}</div>
+                <span class="card-time">${formatTime(m.created_at)}</span>
+              </div>
+            </article>
+          `;
+        });
+        cardsHtml += `</div>`;
+      });
+
+      const readingCount = filtered.filter(m => m.source).length;
+      const thoughtCount = filtered.length - readingCount;
+      let statsText = `${filtered.length} 条备忘录`;
+      if (readingCount > 0 && thoughtCount > 0) {
+        statsText = `${filtered.length} 条 · 📖 ${readingCount} 读书笔记 · 💭 ${thoughtCount} 随想`;
+      }
+
+      app.innerHTML = filterHtml + cardsHtml + `<div class="stats">${statsText}</div>`;
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ===== Filter =====
+    function filterByTag(tag) {
+      if (tag && activeTag === tag) {
+        activeTag = null;
+      } else {
+        activeTag = tag;
+      }
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ===== Search =====
+    const searchToggle = document.getElementById('searchToggle');
+    const searchBar = document.getElementById('searchBar');
+    const searchInput = document.getElementById('searchInput');
+
+    searchToggle.addEventListener('click', () => {
+      searchBar.classList.toggle('open');
+      if (searchBar.classList.contains('open')) {
+        searchInput.focus();
+        searchToggle.classList.add('active');
+      } else {
+        searchToggle.classList.remove('active');
+        searchInput.value = '';
+        searchQuery = '';
+        render();
+      }
+    });
+
+    let searchTimer;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchQuery = e.target.value.trim();
+        render();
+      }, 150);
+    });
+
+    // ===== Theme =====
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('memo-theme');
+    if (savedTheme) {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      themeToggle.textContent = next === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('memo-theme', next);
+    });
+
+    // ===== Back to Top =====
+    const backTop = document.getElementById('backTop');
+    window.addEventListener('scroll', () => {
+      backTop.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+
+    backTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ===== Load Data =====
+    fetch('memos.json')
+      .then(r => r.json())
+      .then(data => {
+        memos = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        render();
+      })
+      .catch(err => {
+        document.getElementById('app').innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">😵</div>
+            <div class="empty-text">加载失败，请刷新重试</div>
+          </div>
+        `;
+        console.error('Failed to load memos:', err);
+      });
+
+    // ===== Keyboard Shortcuts =====
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchToggle.click();
+      }
+      if (e.key === 'Escape' && searchBar.classList.contains('open')) {
+        searchToggle.click();
+      }
+    });
+  </script>
+</body>
+</html>
